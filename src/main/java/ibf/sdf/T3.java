@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class T3 {
 
     public void printBoard(String[] board) {
+        System.out.println("\n");
 
         for (int i = 0; i < 9; i += 3) {
             int temp = i + 1;
@@ -14,6 +15,7 @@ public class T3 {
                 System.out.println("---------");
             }
         }
+        System.out.println("\n");
     }
 
     public String checkWinner(String[] board) {
