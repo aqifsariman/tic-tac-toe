@@ -1,21 +1,73 @@
 package ibf.sdf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class T3 {
 
-    public void printBoard(String[] board) {
-        System.out.println("\n");
+    public String[] generateBoard() {
+        String[] board = new String[9];
 
+        for (int i = 0; i < 9; i++) {
+            board[i] = String.valueOf(i + 1);
+        }
+
+        return board;
+    }
+
+    public String[] printBoard(String[] board, DataOutputStream dos) throws IOException {
         for (int i = 0; i < 9; i += 3) {
             int temp = i + 1;
             int temp2 = i + 2;
-            System.out.println(board[i] + " | " + board[temp] + " | " + board[temp2]);
+            dos.writeUTF(board[i] + " | " + board[temp] + " | " + board[temp2]);
             if (i < 6) {
-                System.out.println("---------");
+                dos.writeUTF("---------");
             }
+            dos.flush();
         }
-        System.out.println("\n");
+        return board;
+    }
+
+    public void startGame(String[] tttBoard, DataInputStream dis, DataOutputStream dos) throws IOException {
+        String player = "X";
+        String winner = "";
+
+        Scanner scanner = new Scanner(System.in);
+        while (winner == "") {
+            Integer input;
+
+            input = scanner.nextInt();
+
+            if ((input > 0) && (input < 10)) {
+                if ((tttBoard[input - 1].equals(String.valueOf(input)))) {
+                    tttBoard[input - 1] = player;
+
+                    if (player.equalsIgnoreCase("X")) {
+                        player = "O";
+                    } else {
+                        player = "X";
+                    }
+                } else {
+                    System.out.println("Position taken up. Please wake up your idea.");
+                }
+
+                printBoard(tttBoard, dos);
+                winner = checkWinner(tttBoard);
+                if (!winner.equals("")) {
+                    if (!winner.equalsIgnoreCase("DRAW")) {
+                        System.out.printf("Player %s has won.", winner);
+                    } else
+                        System.out.println("It's a draw.");
+                }
+            } else {
+                System.out.println("Invalid input. Key in numbers 1 - 9 only.");
+            }
+
+        }
+        scanner.close();
     }
 
     public String checkWinner(String[] board) {

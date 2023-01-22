@@ -1,51 +1,25 @@
 package ibf.sdf;
 
-import java.util.Scanner;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class App {
-    private App() {
-    }
+    public static void main(String[] args) throws IOException {
 
-    // CREATE MULTI THREAD GAME
+        int port = Integer.parseInt(args[0]);
+        try (ServerSocket server = new ServerSocket(port)) {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public static void main(String[] args) {
-        String winner = "";
-        String[] tttBoard = new String[9];
-        String player = "X";
-
-        for (int i = 0; i < 9; i++) {
-            tttBoard[i] = String.valueOf(i + 1);
-        }
-
-        T3 t3 = new T3();
-        t3.printBoard(tttBoard);
-        Scanner scanner = new Scanner(System.in);
-        while (winner == "") {
-            Integer input;
-            System.out.println("TIC TAC TOE GAME");
-            System.out.printf("%s player's turn\n", player);
-            System.out.print("> ");
-            input = scanner.nextInt();
-            if ((input > 0) && (input < 10)) {
-                if ((tttBoard[input - 1].equals(String.valueOf(input)))) {
-                    tttBoard[input - 1] = player;
-
-                    if (player.equalsIgnoreCase("X")) {
-                        player = "O";
-                    } else {
-                        player = "X";
-                    }
-                } else {
-                    System.out.println("Position taken up. Please wake up your idea.");
-                }
-                t3.printBoard(tttBoard);
-                winner = t3.checkWinner(tttBoard);
-                System.out.printf("%s player has won!", winner);
-            } else {
-                System.out.println("Invalid input. Key in numbers 1 - 9 only.");
+            while (true) {
+                Socket socket = server.accept();
+                System.out.printf("Connection received from port %d.\n", port);
+                ClientHandler cH = new ClientHandler(socket);
+                executorService.submit(cH);
             }
-
         }
-        scanner.close();
+
     }
 }
