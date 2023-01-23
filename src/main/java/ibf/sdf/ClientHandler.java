@@ -35,6 +35,8 @@ public class ClientHandler implements Runnable {
             String[] tttBoard = t3.generateBoard();
             String[] printedBoard = t3.printBoard(tttBoard, dos);
             t3.startGame(printedBoard, dis, dos);
+
+            // CLOSING ALL STREAMS
             dis.close();
             bis.close();
             is.close();

@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class T3 {
 
@@ -23,51 +22,54 @@ public class T3 {
             int temp = i + 1;
             int temp2 = i + 2;
             dos.writeUTF(board[i] + " | " + board[temp] + " | " + board[temp2]);
-            if (i < 6) {
-                dos.writeUTF("---------");
-            }
-            dos.flush();
         }
+        dos.flush();
         return board;
     }
 
     public void startGame(String[] tttBoard, DataInputStream dis, DataOutputStream dos) throws IOException {
-        String player = "X";
-        String winner = "";
+        String player = "X", computer = "O", winner = "";
 
-        Scanner scanner = new Scanner(System.in);
         while (winner == "") {
             Integer input;
-
-            input = scanner.nextInt();
-
+            input = Integer.parseInt(dis.readUTF());
             if ((input > 0) && (input < 10)) {
                 if ((tttBoard[input - 1].equals(String.valueOf(input)))) {
                     tttBoard[input - 1] = player;
-
-                    if (player.equalsIgnoreCase("X")) {
-                        player = "O";
-                    } else {
-                        player = "X";
+                    // LOOPING THROUGH BOARD FOR COMPUTER TO TAKE IT'S TURN
+                    for (int i = 0; i < 9; i++) {
+                        if (!tttBoard[i].equals(player)) {
+                            if (tttBoard[i].equals(computer)) {
+                                continue;
+                            }
+                            tttBoard[i] = computer;
+                            break;
+                        }
                     }
-                } else {
-                    System.out.println("Position taken up. Please wake up your idea.");
+
                 }
 
-                printBoard(tttBoard, dos);
-                winner = checkWinner(tttBoard);
-                if (!winner.equals("")) {
-                    if (!winner.equalsIgnoreCase("DRAW")) {
-                        System.out.printf("Player %s has won.", winner);
-                    } else
-                        System.out.println("It's a draw.");
-                }
-            } else {
-                System.out.println("Invalid input. Key in numbers 1 - 9 only.");
             }
+            winner = checkWinner(tttBoard);
+            if (!winner.equals("")) {
+                if (!winner.equalsIgnoreCase("DRAW") && !winner.equalsIgnoreCase("O")) {
+                    printBoard(tttBoard, dos);
+                    dos.writeUTF("\nYou've won! Goodbye!");
+                } else if (!winner.equalsIgnoreCase("DRAW")
+                        && !winner.equalsIgnoreCase("X")) {
+                    printBoard(tttBoard, dos);
+                    dos.writeUTF("Computer won! Goodbye!");
 
+                } else {
+                    printBoard(tttBoard, dos);
+                    dos.writeUTF("It's a draw! Goodbye!");
+                }
+                dos.flush();
+            }
+            printBoard(tttBoard, dos);
+            dos.writeUTF("----------");
+            dos.flush();
         }
-        scanner.close();
     }
 
     public String checkWinner(String[] board) {
